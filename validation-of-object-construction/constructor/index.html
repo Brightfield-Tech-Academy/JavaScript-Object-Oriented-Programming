@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<script>
+"use strict";
+
+
+class User {
+     
+    constructor(name){
+        if(name.length < 5){
+            alert("The name is too short");
+            return;
+        }
+        this.name = name
+    }
+
+    getName(){
+        return this.name;
+    }
+}
+let user = new User("John111");
+console.log(user)
+alert(user.name); // John
+
+user = new User("l"); 
+alert(user.name)// Name is too short.
+</script>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<script>
+"use strict";
+
+class User {
+    #name =''
+    constructor(value){
+        this.#validate(value)
+        this.#name = value
+    }
+
+    getName(){
+        return this.#name;
+    }
+
+    setName(value){
+        this.#validate(value);
+        this.#name = value;
+    }
+
+    #validate(value){
+        if(value.length < 5){
+            alert("The name is too short");
+            return;
+        }
+    }
+
+}
+let user = new User("John111");
+user.setName("Oliver")
+alert(user.getName()); // John
+
+user = new User("l"); 
+</script>
