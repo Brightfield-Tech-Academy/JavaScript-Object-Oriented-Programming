@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/f28becb976.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://bootswatch.com/5/materia/bootstrap.min.css">
+    <link rel="stylesheet" href="https://bootswatch.com/5/solar/bootstrap.min.css">
     <title>Student Management Application</title>
 </head>
 <body>
@@ -33,6 +33,15 @@
             </div>
             <input type="submit" value="Add Student" class="btn btn-primary btn-block" style="margin-top: 10px !important;">
         </form>
+        <table class="table table-striped mt-5" id ='students_list'>
+            <tr>
+                <th>Names</th>
+                <th>Class</th>
+                <th>Ages</th>
+                <th>Email</th>
+                <th></th>
+            </tr>
+        </table>
     </div>
     <script>
         document.querySelector('#student_form').addEventListener('submit',  (event) => {
@@ -57,7 +66,57 @@
                 class: student_class
             })
             localStorage.setItem('students', JSON.stringify(students))
+            const list = document.querySelector('#students_list');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${student_name}</td>
+                <td>${student_class}</td>
+                <td>${student_age}</td>
+                <td>${student_email}</td>
+                <td><a class="btn btn-danger btn-sm delete" data-email="${student_email}">X</a></td>
+            `;
+            list.appendChild(row)
+
            //clear the form
+           document.querySelector('#name').value = ''
+           document.querySelector('#class').value = ''
+           document.querySelector('#age').value  = ''
+           document.querySelector('#email').value = ''
+        });
+        
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const list = document.querySelector('#students_list');
+            let students = JSON.parse(localStorage.getItem('students'));
+            for(let student of students){
+                const row = document.createElement('tr');
+                row.dataset.email = student.email
+                row.classList.add('student_row')
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.class}</td>
+                    <td>${student.age}</td>
+                    <td>${student.email}</td>
+                    <td><a class="btn btn-danger btn-sm delete" data-email="${student.email}">X</a></td>
+                `;
+
+                list.appendChild(row)
+            }
+        })
+
+        document.querySelector('#students_list').addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete')) {
+                const email = event.target.dataset.email;
+               document.querySelector(`.student_row[data-email="${email}"]`).remove();
+               
+               let students = JSON.parse(localStorage.getItem('students'));
+               students.forEach((student, index) => {
+                   if(student.email === email){
+                       students.splice(index, 1)
+                   }
+               });
+               localStorage.setItem('students', JSON.stringify(students))
+               console.log(students);
+            }
         });
     </script>
 </body>
