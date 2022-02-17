@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/f28becb976.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://bootswatch.com/5/solar/bootstrap.min.css">
+    <title>Student Management Application</title>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="display-4 text-center">
+            <i class="fas fa-user-graduate"></i>
+            Student<span class="text-primary">Management</span>App
+        </h1>
+        <form id="student_form">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="class">Class</label>
+                <input type="text" id="class" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" class="form-control" required>
+            </div>
+            <input type="submit" value="Add Student" class="btn btn-primary btn-block" style="margin-top: 10px !important;">
+        </form>
+        <table class="table table-striped mt-5" id ='students_list'>
+            <tr>
+                <th>Names</th>
+                <th>Class</th>
+                <th>Ages</th>
+                <th>Email</th>
+                <th></th>
+            </tr>
+        </table>
+    </div>
+    <script>
+
+        class UserInterface {
+            constructor(storage){
+                this.storage = storage;
+            }
+            addStudent(){
+                //capture the student info 
+                let student_name = document.querySelector('#name').value 
+                let student_class = document.querySelector('#class').value 
+                let student_age = document.querySelector('#age').value 
+                let student_email = document.querySelector('#email').value 
+                let students = this.storage.fetchStudents();
+                if(students === null){
+                    students = [];
+                }
+                students.push({
+                    name: student_name,
+                    age:student_age,
+                    email: student_email,
+                    class: student_class
+                })
+                this.storage.addStudents(students);
+                this.listStudent(student_name, student_class, student_age, student_email)
+                //clear the form
+                this.clearForm();
+            }
+
+            listStudent(student_name, student_class, student_age, student_email){
+                const list = document.querySelector('#students_list');
+                const row = document.createElement('tr');
+                row.dataset.email = student_email
+                row.classList.add('student_row')
+                row.innerHTML = `
+                    <td>${student_name}</td>
+                    <td>${student_class}</td>
+                    <td>${student_age}</td>
+                    <td>${student_email}</td>
+                    <td><a class="btn btn-danger btn-sm delete" data-email="${student_email}">X</a></td>
+                `;
+                list.appendChild(row)
+            }
+
+            clearForm() {
+                document.querySelector('#name').value = ''
+                document.querySelector('#class').value = ''
+                document.querySelector('#age').value  = ''
+                document.querySelector('#email').value = ''
+            }
+
+            deleteStudent(event){
+                if (event.target.classList.contains('delete')) {
+                    const email = event.target.dataset.email;
+                    document.querySelector(`.student_row[data-email="${email}"`).remove();
+                
+                    let students = this.storage.fetchStudents();
+                    students.forEach((student, index) => {
+                        if(student.email === email){
+                            students.splice(index, 1)
+                        }
+                    });
+                    this.storage.addStudents(students);
+                }
+            }
+        }
+        class Storage{
+            fetchStudents(){
+                let students = JSON.parse(localStorage.getItem('students'));
+                return students;
+            }
+            addStudents(students){
+                localStorage.setItem('students', JSON.stringify(students))
+            }
+        }
+        
+        const storage = new Storage();
+        const UI = new UserInterface(storage);
+        document.querySelector('#student_form').addEventListener('submit',  (event) => {
+            event.preventDefault();
+            UI.addStudent();
+        });
+        
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let students = storage.fetchStudentsFromStore();
+            for(let student of students){
+                UI.listStudent(student.name, student.class, student.age, student.email)
+            }
+        })
+
+        document.querySelector('#students_list').addEventListener('click', (event) => {
+            UI.deleteStudent(event)
+        });
+    </script>
+</body>
+</html>

@@ -94,7 +94,7 @@
         function deleteStudent(event){
             if (event.target.classList.contains('delete')) {
                 const email = event.target.dataset.email;
-                document.querySelector(`.student_row[data-email="${email}"]`).remove();
+                document.querySelector(`.student_row[data-email="${email}"`).remove();
                
                 let students = fetchStudentsFromStore();
                 students.forEach((student, index) => {
